@@ -3,11 +3,16 @@ import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { AppLoading, Asset, Font } from 'expo';
 import { Ionicons } from '@expo/vector-icons';
 import RootNavigation from './navigation/RootNavigation';
+import config from './config';
 
 export default class App extends React.Component {
   state = {
     isLoadingComplete: false,
   };
+
+  // componentDidMount () {
+  //   fetch(config.URL);
+  // }
 
   render() {
     if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
@@ -40,6 +45,7 @@ export default class App extends React.Component {
         ...Ionicons.font,
         // We include SpaceMono because we use it in HomeScreen.js. Feel free
         // to remove this if you are not using it in your app
+        'roboto': require('./assets/fonts/Roboto-Regular.ttf'),
         'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
       }),
     ]);

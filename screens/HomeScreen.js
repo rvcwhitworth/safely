@@ -7,27 +7,28 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Button
 } from 'react-native';
 import { WebBrowser } from 'expo';
 
 import { MonoText } from '../components/StyledText';
+import LocationInput from '../components/LocationInput.js';
 
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
     header: null,
+    title: 'Home'
   };
 
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.Text}>This is your app!</Text>
-
-        <View style={styles.tabBarInfoContainer}>
-          <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text>
-
-          <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-            <MonoText style={styles.codeHighlightText}>navigation/MainTabNavigator.js</MonoText>
-          </View>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>Safe.ly</Text>
+        </View>
+        
+        <View style={styles.body}>
+          <LocationInput />
         </View>
       </View>
     );
@@ -71,6 +72,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  header: {
+    backgroundColor: '#1abc9c',
+    justifyContent: 'center',
+    flex: 10
+  },
+  body: {
+    flex: 90
+  },
+  headerText: {
+    fontFamily: 'roboto',
+    textAlign: 'center',
+    fontSize: 25,
+    fontWeight: 'bold'
   },
   developmentModeText: {
     marginBottom: 20,
