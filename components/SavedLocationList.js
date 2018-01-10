@@ -10,11 +10,12 @@ export default class SavedLocationList extends React.Component {
   render() {
     return (
     <ScrollView style={styles.container}>
-      {this.props.locations.map((location, i) =>
+      {this.props.locations.map((location) =>
         <SavedLocationListItem 
+          deleteLocation={this.props.deleteLocation}
           selectLocation={this.props.selectLocation} 
           location={location} 
-          key={i}
+          key={location.name}
         />)}
     </ScrollView>
     );
@@ -23,7 +24,8 @@ export default class SavedLocationList extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 15,
+    height: 150,
+    paddingTop: 5,
     backgroundColor: '#fff'
   },
 });

@@ -16,6 +16,13 @@ export default class LocationInput extends React.Component {
     this.handleTextChange = this.handleTextChange.bind(this);
     this.handleTextSubmit = this.handleTextSubmit.bind(this);
     this.handleLocationNameChange = this.handleLocationNameChange.bind(this);
+    this.deleteLocation = this.deleteLocation.bind(this);
+  }
+
+  deleteLocation (location) {
+    let locations = this.state.locations.slice();
+    locations.splice(locations.indexOf(location), 1);
+    this.setState({locations});
   }
 
   componentWillMount () {
@@ -107,7 +114,11 @@ export default class LocationInput extends React.Component {
         />
         {!!this.state.locations.length &&  <Text style={styles.savedLocations}>Saved Locations</Text>}        
         {!!this.state.locations.length &&  
-          <SavedLocationList selectLocation={this.props.setLocation} locations={this.state.locations} />}
+          <SavedLocationList 
+            deleteLocation={this.deleteLocation} 
+            selectLocation={this.props.setLocation} 
+            locations={this.state.locations}
+          />}
       </View>
     );
   }
