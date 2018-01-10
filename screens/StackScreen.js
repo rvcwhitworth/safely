@@ -9,7 +9,7 @@ export default class StackScreen extends React.Component {
   render() {
     return (
     <ScrollView style={styles.container}>
-      <Text> Stack info will be rendered here </Text>
+      <Text>Logo, React Native, AWS EC2 </Text>
     </ScrollView>
     );
   }

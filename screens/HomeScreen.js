@@ -13,6 +13,7 @@ import { WebBrowser } from 'expo';
 
 import { MonoText } from '../components/StyledText';
 import LocationInput from '../components/LocationInput.js';
+import Main from '../components/Main.js';
 
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
@@ -28,7 +29,7 @@ export default class HomeScreen extends React.Component {
         </View>
         
         <View style={styles.body}>
-          <LocationInput />
+          <Main />
         </View>
       </View>
     );

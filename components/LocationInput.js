@@ -1,14 +1,43 @@
 import React from 'react';
-import { Alert, Button, View, TextInput , Text, StyleSheet } from 'react-native';
+import { AsyncStorage, Alert, Button, View, TextInput , Text, StyleSheet } from 'react-native';
 import axios from 'axios';
 import config from '../config.js';
+import SavedLocationList from './SavedLocationList.js';
 
 export default class LocationInput extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      address: ''
+      address: '',
+      locations: [],
+      locationName: ''
     }
+
+    this.handleTextChange = this.handleTextChange.bind(this);
+    this.handleTextSubmit = this.handleTextSubmit.bind(this);
+    this.handleLocationNameChange = this.handleLocationNameChange.bind(this);
+  }
+
+  componentWillMount () {
+    AsyncStorage.getItem('@safely:savedLocations')
+    .then((locations) => {
+      console.log('locations', locations);
+      locations ? this.setState({
+        locations: JSON.parse(locations)
+      }) : this.setState({
+        locations: []
+      });
+    })
+    .catch((error) => {
+      console.error('Error retrieving locations', error);
+      this.setState({
+        locations: []
+      });
+    });
+  }
+
+  handleLocationNameChange (locationName) {
+    this.setState({locationName});
   }
 
   handleTextChange (address) {
@@ -22,10 +51,23 @@ export default class LocationInput extends React.Component {
       }
     })
     .then((response) => {
-      Alert.alert('Successful response', JSON.stringify(response));
-      this.setState({
-        location: response
-      });
+      const fullAddress = response.data[0].formatted_address;
+      Alert.alert(
+        'Confirm Location',
+        fullAddress,
+        [
+          {text: 'Nope', onPress: () => this.setState({address: ''})},
+          {text: 'That\'s it!', onPress: () => {
+            if (this.state.locationName.length) {
+              AsyncStorage.setItem('@safely:savedLocations',
+              JSON.stringify([...this.state.locations, {name: this.state.locationName, geometry: response.data[0].geometry.location}]))
+              .catch((error) => console.error('Error saving location to storage'));
+            }
+            this.props.setLocation(response.data[0].geometry.location)}
+          }
+        ],
+        {cancelable: false}
+      );
     })
     .catch((error) => {
       Alert.alert(
@@ -44,9 +86,17 @@ export default class LocationInput extends React.Component {
       <View style={styles.container}>
         <Text style={styles.text}> Ready to go home? </Text>
         <TextInput
+          value={this.state.address}
           style={styles.input}
           placeholder="Point me in the right direction"
           onChangeText={this.handleTextChange.bind(this)}
+          onSubmitEditingProp={this.handleTextSubmit.bind(this)}
+        />
+        <TextInput
+          value={this.state.locationName}
+          style={styles.input}
+          placeholder="(optional) Name this location"
+          onChangeText={this.handleLocationNameChange.bind(this)}
           onSubmitEditingProp={this.handleTextSubmit.bind(this)}
         />
         <Button 
@@ -55,6 +105,9 @@ export default class LocationInput extends React.Component {
           color="#1abc9c"
           onPress={this.handleTextSubmit.bind(this)}
         />
+        {!!this.state.locations.length &&  <Text style={styles.savedLocations}>Saved Locations</Text>}        
+        {!!this.state.locations.length &&  
+          <SavedLocationList selectLocation={this.props.setLocation} locations={this.state.locations} />}
       </View>
     );
   }
@@ -62,7 +115,7 @@ export default class LocationInput extends React.Component {
 
 const styles = StyleSheet.create({
   input: {
-    height: 100,
+    height: 90,
     fontSize: 25,
     textAlign: 'center'
   },
@@ -72,8 +125,15 @@ const styles = StyleSheet.create({
     fontSize: 35,
     fontWeight: 'bold'
   },
+  savedLocations: {
+    paddingTop: 20,
+    fontFamily: 'roboto',
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: 'bold'
+  },
   container: {
-    marginTop: 70,
+    marginTop: 20,
     padding: 10,
     justifyContent: 'space-between'
   }
