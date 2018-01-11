@@ -1,10 +1,11 @@
 import React from 'react';
-import { Alert, Button, View, TextInput , Text, StyleSheet } from 'react-native';
+import { ActivityIndicator, Alert, Button, View, TextInput , Text, StyleSheet } from 'react-native';
 import axios from 'axios';
 import config from '../config.js';
 import LocationInput from './LocationInput.js';
 import ContactList from './ContactList.js';
 import ConfirmTrip from './ConfirmTrip.js';
+import OngoingTrip from './OngoingTrip.js';
 import { Contacts, Permissions, AppLoading } from 'expo';
 const _ = require('underscore');
 
@@ -21,6 +22,10 @@ export default class Main extends React.Component {
     this.getContacts = this.getContacts.bind(this);
     this.setContacts = this.setContacts.bind(this);
     this.cancelTrip = this.cancelTrip.bind(this);
+  }
+
+  componentDidMount () {
+    this.getContacts().then(() => this.handleFinishLoading());
   }
 
   async getContacts () {
@@ -74,14 +79,19 @@ export default class Main extends React.Component {
     });
   }
 
+  confirmTrip (tripId) {
+    this.setState({
+      tripId: tripId,
+      currentView: 'Ongoing Trip'
+    });
+  }
+
   render() {
     if (this.state.loading) {
       return (
-        <AppLoading
-          startAsync={this.getContacts}
-          onError={console.warn}
-          onFinish={this.handleFinishLoading}
-        />
+          <View style={{flex: 1, justifyContent: 'center'}}>
+            <ActivityIndicator animating={true} size="large" color="#1abc9c" />
+          </View>
       )
     } else {
       switch (this.state.currentView) {
@@ -97,7 +107,16 @@ export default class Main extends React.Component {
               location={this.state.location}
             />
           )
+        case 'OngoingTrip':
+          return (
+            <OngoingTrip
+              cancelTrip={this.cancelTrip}
+              location={this.state.location}
+              tripId={this.state.tripId}
+            />
+          )
       }
     }
   }
 }
+

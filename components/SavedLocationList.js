@@ -15,7 +15,7 @@ export default class SavedLocationList extends React.Component {
           deleteLocation={this.props.deleteLocation}
           selectLocation={this.props.selectLocation} 
           location={location} 
-          key={location.name}
+          key={location.name + location.fullAddress}
         />)}
     </ScrollView>
     );

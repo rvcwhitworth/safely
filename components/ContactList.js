@@ -15,6 +15,7 @@ export default class ContactList extends React.Component {
 
     this.submitContacts = this.submitContacts.bind(this);
     this.toggleContact = this.toggleContact.bind(this);
+    this.deleteSavedContact = this.deleteSavedContact.bind(this);
   }
 
   componentDidMount () {
@@ -29,6 +30,15 @@ export default class ContactList extends React.Component {
     .catch((error) => {
       console.error('Error retrieving saved contacts', error);
     });
+  }
+
+  deleteSavedContact (contact) {
+    let savedContacts = this.state.savedContacts.slice();
+    savedContacts.splice(savedContacts.indexOf(contact), 1);
+    this.setState({savedContacts});
+    if (this.state.selectedContacts.includes(contact)) {
+      this.toggleContact(contact);
+    }
   }
 
   submitContacts () {
@@ -49,7 +59,7 @@ export default class ContactList extends React.Component {
   toggleContact (contact) {
     if (this.state.selectedContacts.includes(contact)) {
       this.state.selectedContacts.splice(this.state.selectedContacts.indexOf(contact), 1);
-    } else {
+    } else if (contact.phoneNumbers.length) {
       this.state.selectedContacts.push(contact);
     }
   }
@@ -76,6 +86,8 @@ export default class ContactList extends React.Component {
                 contact={contact}
                 key={contact.id}
                 toggleContact={this.toggleContact}
+                saved={true}
+                deleteSavedContact={this.deleteSavedContact}
               />))}
           </ScrollView>}
 
@@ -89,6 +101,7 @@ export default class ContactList extends React.Component {
                 contact={item}
                 key={item.id} 
                 toggleContact={this.toggleContact}
+                saved={false}
               />
             )
           }

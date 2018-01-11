@@ -55,7 +55,7 @@ export default class LocationInput extends React.Component {
   }
 
   handleTextSubmit () {
-    axios.get(config.URL + '/location', {
+    axios.get(config.URL + '/api/locations', {
       params: {
         address: this.state.address
       }

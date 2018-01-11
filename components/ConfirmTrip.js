@@ -5,7 +5,9 @@ import axios from 'axios';
 export default class ConfirmTrip extends React.Component {
   constructor (props) {
     super(props);
-    
+    this.state = {
+      loading: false
+    }
     this.submitTrip = this.submitTrip.bind(this);
   }
 
@@ -14,32 +16,53 @@ export default class ConfirmTrip extends React.Component {
   }
 
   submitTrip () {
-    Alert.alert('Trip confirmed!');
+    this.setState({
+      loading: true
+    }, () => {
+      axios.post('/api/trips', {this.props.location, this.props.contacts}).then((response) => {
+        console.log(response);
+        this.setState({
+          loading: false
+        });
+        this.props.confirmTrip(response.data.tripId);
+      });
+    });    
   }
 
   render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.text}> Confirm Trip </Text>
-        <Text> Location: {this.props.location.name ? this.props.location.name : this.props.location.fullAddress} </Text>
-        <Text> Notifying: </Text>
-        <ScrollView>
-          {this.props.contacts.map((contact, i) => <Text key={i}>{contact.name + ' ' + contact.phoneNumber}</Text>)}
-        </ScrollView>
-        <View style={styles.buttonContainer}>
-          <Button
-            title="Cancel"
-            onPress={this.props.cancelTrip}
-            color="red"
-          />
-          <Button
-            title="Confirm"
-            onPress={this.submitTrip}
-            color="#1abc9c"
-          />
+    if (this.state.loading) {
+      return (
+        <View style={styles.container}>
+          <ActivityIndicator size="large" color="#1abc9c" />
         </View>
-      </View>
-    );
+      )
+    } else {
+      return (
+        <View style={styles.container}>
+          <Text style={styles.text}> Confirm Trip </Text>
+          <Text style={styles.subHeader}> Location:  </Text>
+          <Text style={styles.locationText}>{this.props.location.name ? this.props.location.name : this.props.location.fullAddress}</Text>
+
+          <Text style={styles.subHeader}> Notifying: </Text>
+          <ScrollView style={styles.fullList}>
+            {this.props.contacts.map((contact, i) => <Text style={styles.item} key={i}>{contact.name}</Text>)}
+          </ScrollView>
+
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Cancel"
+              onPress={this.props.cancelTrip}
+              color="red"
+            />
+            <Button
+              title="Confirm"
+              onPress={this.submitTrip}
+              color="#1abc9c"
+            />
+          </View>
+        </View>
+      );
+    }
   }
 }
 
@@ -60,34 +83,26 @@ const styles = StyleSheet.create({
     padding: 10,
     justifyContent: 'space-between'
   },
-  selectedItem: {
-    borderRadius: 4,
-    borderWidth: 0.5,
-    borderColor: '#d6d7da',
-    padding: 10,
-    fontSize: 18,
-    height: 44,
-    fontWeight: 'bold'
-  },
   item: {
     padding: 10,
     fontSize: 18,
     height: 44,
+    textAlign: 'center'
   },
-  contactHeader: {
+  subHeader: {
     paddingTop: 20,
     fontFamily: 'roboto',
     textAlign: 'center',
     fontSize: 20,
     fontWeight: 'bold'
   },
-  savedList: {
-    height: 100
+  locationText: {
+    paddingTop: 5,
+    fontFamily: 'roboto',
+    textAlign: 'center',
+    fontSize: 18
   },
   fullList: {
-    height: 200
-  },
-  soloList: {
-    height: 300
+    height: 200,
   }
 });
