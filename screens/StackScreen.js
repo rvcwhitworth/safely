@@ -9,7 +9,8 @@ export default class StackScreen extends React.Component {
   render() {
     return (
     <ScrollView style={styles.container}>
-      <Text>Logo, React Native, AWS EC2 </Text>
+      <Text>Logo, React Native, AWS EC2, Geocode API, Twilio API </Text>
+      <Text> Libraries: react-native-swipeout, react-native-contacts</Text>
     </ScrollView>
     );
   }

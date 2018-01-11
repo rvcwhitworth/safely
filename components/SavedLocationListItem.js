@@ -15,7 +15,7 @@ export default class SavedLocationListItem extends React.Component {
   }
 
   handleLocationClick () {
-    this.props.selectLocation(this.props.location.geometry);
+    this.props.selectLocation(this.props.location);
   }
 
   render() {

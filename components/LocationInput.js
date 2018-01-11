@@ -28,7 +28,6 @@ export default class LocationInput extends React.Component {
   componentWillMount () {
     AsyncStorage.getItem('@safely:savedLocations')
     .then((locations) => {
-      console.log('locations', locations);
       locations ? this.setState({
         locations: JSON.parse(locations)
       }) : this.setState({
@@ -37,9 +36,6 @@ export default class LocationInput extends React.Component {
     })
     .catch((error) => {
       console.error('Error retrieving locations', error);
-      this.setState({
-        locations: []
-      });
     });
   }
 
@@ -67,11 +63,13 @@ export default class LocationInput extends React.Component {
           {text: 'That\'s it!', onPress: () => {
             if (this.state.locationName.length) {
               AsyncStorage.setItem('@safely:savedLocations',
-              JSON.stringify([...this.state.locations, {name: this.state.locationName, geometry: response.data[0].geometry.location}]))
+              JSON.stringify([...this.state.locations, 
+                {name: this.state.locationName, geometry: response.data[0].geometry.location, fullAddress: fullAddress}]))
               .catch((error) => console.error('Error saving location to storage'));
             }
-            this.props.setLocation(response.data[0].geometry.location)}
+            this.props.setLocation({geometry: response.data[0].geometry.location, fullAddress: fullAddress});
           }
+        }
         ],
         {cancelable: false}
       );
