@@ -4,6 +4,7 @@ import axios from 'axios';
 import config from '../config.js';
 import LocationInput from './LocationInput.js';
 import ContactList from './ContactList.js';
+import ConfirmTrip from './ConfirmTrip.js';
 import { Contacts, Permissions, AppLoading } from 'expo';
 const _ = require('underscore');
 
@@ -17,7 +18,9 @@ export default class Main extends React.Component {
 
     this.setLocation = this.setLocation.bind(this);
     this.handleFinishLoading = this.handleFinishLoading.bind(this);
-    this.getContacts = this.getContacts.bind(this)    
+    this.getContacts = this.getContacts.bind(this);
+    this.setContacts = this.setContacts.bind(this);
+    this.cancelTrip = this.cancelTrip.bind(this);
   }
 
   async getContacts () {
@@ -52,14 +55,22 @@ export default class Main extends React.Component {
 
   setContacts (contacts) {
     this.setState({
-      contacts: contacts,
-      currentView: 'ContactList'
+      selectedContacts: contacts,
+      currentView: 'ConfirmTrip'
     });
   }
 
   handleFinishLoading () {
     this.setState({
       loading: false
+    });
+  }
+
+  cancelTrip () {
+    this.setState({
+      selectedContacts: [],
+      location: null,
+      currentView: 'LocationInput'
     });
   }
 
@@ -77,7 +88,15 @@ export default class Main extends React.Component {
         case 'LocationInput':
           return (<LocationInput setLocation={this.setLocation}/>);
         case 'ContactList':
-          return (<ContactList contacts={this.state.contacts} setContacts={this.setContacts}/>);
+          return (<ContactList cancelTrip={this.cancelTrip} contacts={this.state.contacts} setContacts={this.setContacts}/>);
+        case 'ConfirmTrip':
+          return (
+            <ConfirmTrip 
+              cancelTrip={this.cancelTrip} 
+              contacts={this.state.selectedContacts} 
+              location={this.state.location}
+            />
+          )
       }
     }
   }
