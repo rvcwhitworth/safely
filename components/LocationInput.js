@@ -17,6 +17,7 @@ export default class LocationInput extends React.Component {
     this.handleTextSubmit = this.handleTextSubmit.bind(this);
     this.handleLocationNameChange = this.handleLocationNameChange.bind(this);
     this.deleteLocation = this.deleteLocation.bind(this);
+    this.handleSavedSelection = this.handleSavedSelection.bind(this);
   }
 
   deleteLocation (location) {
@@ -45,6 +46,12 @@ export default class LocationInput extends React.Component {
 
   handleTextChange (address) {
     this.setState({address});
+  }
+
+  handleSavedSelection (location) {
+    AsyncStorage.setItem('@safely:savedLocations', JSON.stringify(this.state.locations))
+    .then(() => this.props.setLocation(location))
+    .catch((error) => console.error('Error saving locations to storage'));
   }
 
   handleTextSubmit () {
@@ -114,7 +121,7 @@ export default class LocationInput extends React.Component {
         {!!this.state.locations.length &&  
           <SavedLocationList 
             deleteLocation={this.deleteLocation} 
-            selectLocation={this.props.setLocation} 
+            selectLocation={this.handleSavedSelection} 
             locations={this.state.locations}
           />}
       </View>
