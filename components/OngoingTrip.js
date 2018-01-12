@@ -1,26 +1,85 @@
 import React from 'react';
 import { ScrollView, Alert, Button, View, Text, StyleSheet } from 'react-native';
 import axios from 'axios';
+import { Location, Permissions } from 'expo';
+import config from '../config.js';
 
 export default class OngoingTrip extends React.Component {
   constructor (props) {
     super(props);
-    
-    this.submitTrip = this.submitTrip.bind(this);
+    this.state = {
+      userLocation: {
+        coords: {
+          latitude: 'NOT UPDATED',
+          longitude: 'NOT UPDATED'
+        }
+      },
+      delta: {
+        latitude: 'n/a',
+        longitude: 'n/a'
+      }
+    }
+    this.updateLocation = this.updateLocation.bind(this);
+    this.endTrip = this.endTrip.bind(this);
   }
 
   componentDidMount () {
-  
+    this.getUserLocation();
+  }
+
+  async getUserLocation () {
+    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status !== 'granted') {
+      this.setState({
+        errorMessage: 'Permission to access location was denied',
+      });
+    }
+
+    let locationSubscription = await Location.watchPositionAsync({}, this.updateLocation);
+    this.setState({ locationSubscription });
+  }
+
+  updateLocation (userLocation) {
+    this.setState({userLocation}, () => {
+      axios.put(config.URL + '/api/trips', {tripId: this.props.tripId, userLocation: this.state.userLocation})
+      .then((response) => this.compareLocation())
+      .catch((err) => console.error('Error updating location', err));
+    });
+  }
+
+  compareLocation () {
+    let delta = {
+      latitude: Math.abs(this.state.userLocation.coords.latitude - this.props.location.geometry.lat),
+      longitude: Math.abs(this.state.userLocation.coords.longitude - this.props.location.geometry.lng)      
+    }
+
+    if (delta.latitude < 0.0001) this.endTrip(null, true);
+  }
+
+  endTrip (e, arrived = false) {
+    axios.delete(config.URL + '/api/trips', {
+      params: {
+        tripId: this.props.tripId, 
+        arrived: arrived
+      }
+    })
+    .then(() => {
+      if (arrived) {
+        Alert.alert('You have arrived!', 'Your contacts have been notified.  Thanks for using safe.ly!');
+      }
+      this.props.cancelTrip();
+    })
+    .catch((err) => console.error('Error completing trip!', err));
   }
 
   render() {
     return (
       <View style={styles.container}>
         <Text style={styles.text}> Ongoing Trip </Text>
-        <Text> Get there safely, we'll take care of everything else! </Text>
+        <Text style={styles.subHeader}> Get there safely, we'll take care of everything else! </Text>
         <Button
           title="Cancel Trip"
-          onPress={this.props.cancelTrip}
+          onPress={this.endTrip}
           color="red"
         />
       </View>
@@ -29,10 +88,6 @@ export default class OngoingTrip extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around'
-  },
   text: {
     fontFamily: 'roboto',
     textAlign: 'center',
@@ -45,26 +100,11 @@ const styles = StyleSheet.create({
     padding: 10,
     justifyContent: 'space-between'
   },
-  item: {
-    padding: 10,
-    fontSize: 18,
-    height: 44,
-    textAlign: 'center'
-  },
   subHeader: {
     paddingTop: 20,
     fontFamily: 'roboto',
     textAlign: 'center',
     fontSize: 20,
     fontWeight: 'bold'
-  },
-  locationText: {
-    paddingTop: 5,
-    fontFamily: 'roboto',
-    textAlign: 'center',
-    fontSize: 18
-  },
-  fullList: {
-    height: 200,
   }
 });

@@ -22,6 +22,7 @@ export default class Main extends React.Component {
     this.getContacts = this.getContacts.bind(this);
     this.setContacts = this.setContacts.bind(this);
     this.cancelTrip = this.cancelTrip.bind(this);
+    this.confirmTrip = this.confirmTrip.bind(this);
   }
 
   componentDidMount () {
@@ -43,8 +44,9 @@ export default class Main extends React.Component {
 
     if (contacts.total > 0) {
       this.setState({
-        contacts: _.uniq(contacts.data.sort((a, b) => a.name.localeCompare(b.name)), 
-          true, (contact) => contact.id)
+        contacts: _.uniq(contacts.data.sort((a, b) => {
+          return a.name && b.name ? a.name.localeCompare(b.name) : -1;
+        }), true, (contact) => contact.id)
       });
     }
 
@@ -75,14 +77,15 @@ export default class Main extends React.Component {
     this.setState({
       selectedContacts: [],
       location: null,
-      currentView: 'LocationInput'
+      currentView: 'LocationInput',
+      tripId: null
     });
   }
 
   confirmTrip (tripId) {
     this.setState({
       tripId: tripId,
-      currentView: 'Ongoing Trip'
+      currentView: 'OngoingTrip'
     });
   }
 
@@ -105,6 +108,7 @@ export default class Main extends React.Component {
               cancelTrip={this.cancelTrip} 
               contacts={this.state.selectedContacts} 
               location={this.state.location}
+              confirmTrip={this.confirmTrip}
             />
           )
         case 'OngoingTrip':

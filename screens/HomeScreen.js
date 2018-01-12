@@ -25,7 +25,7 @@ export default class HomeScreen extends React.Component {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.headerText}>Safe.ly</Text>
+          <Text style={styles.headerText}>safe.ly</Text>
         </View>
         
         <View style={styles.body}>

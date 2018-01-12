@@ -1,6 +1,7 @@
 import React from 'react';
-import { ScrollView, Alert, Button, View, Text, StyleSheet } from 'react-native';
+import { ActivityIndicator, ScrollView, Alert, Button, View, Text, StyleSheet } from 'react-native';
 import axios from 'axios';
+import config from '../config.js';
 
 export default class ConfirmTrip extends React.Component {
   constructor (props) {
@@ -19,8 +20,8 @@ export default class ConfirmTrip extends React.Component {
     this.setState({
       loading: true
     }, () => {
-      axios.post('/api/trips', {this.props.location, this.props.contacts}).then((response) => {
-        console.log(response);
+      axios.post(config.URL + '/api/trips', {location: this.props.location, contacts: this.props.contacts})
+      .then((response) => {
         this.setState({
           loading: false
         });
