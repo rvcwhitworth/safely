@@ -46,7 +46,7 @@ app.put('/api/trips', (req, res) => {
 });
 
 app.delete('/api/trips', (req, res) => {
-  if (req.query.arrived) {
+  if (req.query.arrived === 'true') {
     db.getContacts(req.query.tripId)
     .then((contacts) => {
       contacts.forEach((contact) => {

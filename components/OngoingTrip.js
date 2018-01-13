@@ -57,6 +57,7 @@ export default class OngoingTrip extends React.Component {
   }
 
   endTrip (e, arrived = false) {
+    this.state.locationSubscription.remove();
     axios.delete(config.URL + '/api/trips', {
       params: {
         tripId: this.props.tripId, 
