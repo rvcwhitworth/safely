@@ -53,7 +53,7 @@ export default class OngoingTrip extends React.Component {
       longitude: Math.abs(this.state.userLocation.coords.longitude - this.props.location.geometry.lng)      
     }
 
-    if (delta.latitude < 0.0001) this.endTrip(null, true);
+    if (delta.latitude < 0.001 && delta.longitude < 0.001) this.endTrip(null, true);
   }
 
   endTrip (e, arrived = false) {

@@ -35,16 +35,24 @@ const updateTrip = ({tripId, userLocation}) => {
     return trip.update({
       userLocation: JSON.stringify(userLocation),
       lastUpdated: JSON.stringify(new Date())
-    })
+    });
   });
 };
 
-const deleteTrip = ({tripId}) => {
+const deleteTrip = (tripId) => {
   return Trip.remove({_id: tripId});
 };
+
+const getContacts = (tripId) => {
+  return Trip.findById(tripId)
+  .then((trip) => {
+    return JSON.parse(trip.contacts);
+  });
+}
 
 module.exports = {
   addNewTrip,
   updateTrip,
-  deleteTrip
+  deleteTrip,
+  getContacts
 };

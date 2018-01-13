@@ -10,10 +10,6 @@ export default class App extends React.Component {
     isLoadingComplete: false,
   };
 
-  // componentDidMount () {
-  //   fetch(config.URL);
-  // }
-
   render() {
     if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
       return (

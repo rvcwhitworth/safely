@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const config = require('./config.js');
+const client = require('twilio')(config.TWILIO_SID, config.TWILIO_TOKEN);
 const app = express();
 const port = 4990;
 const db = require('./database.js');
@@ -9,6 +10,7 @@ const db = require('./database.js');
 const googleMapsClient = require('@google/maps').createClient({
   key: config.GOOGLE_API_KEY
 });
+
 
 app.use(morgan('dev'));
 app.use(bodyParser.json());
@@ -41,13 +43,35 @@ app.put('/api/trips', (req, res) => {
   db.updateTrip(req.body)
   .then(() => res.sendStatus(200))
   .catch((err) => res.status(500).send(err));
-})
+});
 
 app.delete('/api/trips', (req, res) => {
-  db.deleteTrip(req.query.tripId)
-  .then(() => res.sendStatus(200))
-  .catch((err) => res.status(500).send(err));
-})
+  if (req.query.arrived) {
+    db.getContacts(req.query.tripId)
+    .then((contacts) => {
+      contacts.forEach((contact) => {
+        client.messages.create({
+          to: contact.phoneNumber,
+          from: config.TWILIO_PHONE,
+          body: `Hey ${contact.name}, this is an automated message from safe.ly to inform you that your friend has arrived home.`
+        })
+        .then((message) => console.log('Message Sent!', message.sid))
+        .catch((err) => {
+          console.error('Could not send message', err);
+        });
+      });
+    })
+    .then(() => {
+      db.deleteTrip(req.query.tripId)
+      .then(() => res.sendStatus(200))
+      .catch((err) => res.status(500).send(err));
+    });
+  } else {
+    db.deleteTrip(req.query.tripId)
+    .then(() => res.sendStatus(200))
+    .catch((err) => res.status(500).send(err));
+  }
+});
 
 app.listen(port, function() {
   console.log('listening on port,', port);
