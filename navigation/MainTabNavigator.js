@@ -7,12 +7,16 @@ import Colors from '../constants/Colors';
 
 import HomeScreen from '../screens/HomeScreen';
 import StackScreen from '../screens/StackScreen';
+import ConfigScreen from '../screens/ConfigScreen';
 
 export default TabNavigator(
   {
     Home: {
       screen: HomeScreen,
     },
+    // Config: {
+    //   screen: ConfigScreen
+    // },
     Links: {
       screen: StackScreen,
     }
@@ -32,6 +36,8 @@ export default TabNavigator(
           case 'Links':
             iconName = Platform.OS === 'ios' ? `ios-link${focused ? '' : '-outline'}` : 'md-link';
             break;
+          // case 'Config':
+          //   iconName = Platform.OS === 'ios' ? `ios-options${focused ? '' : '-outline'}` : 'md-options';
         }
         return (
           <Ionicons

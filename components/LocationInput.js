@@ -1,8 +1,9 @@
 import React from 'react';
-import { AsyncStorage, Alert, Button, View, TextInput , Text, StyleSheet } from 'react-native';
+import { AsyncStorage, Alert, Button, View, TextInput , Text, StyleSheet, Modal } from 'react-native';
 import axios from 'axios';
 import config from '../config.js';
 import SavedLocationList from './SavedLocationList.js';
+import ModalContents from './ModalContents.js';
 
 export default class LocationInput extends React.Component {
   constructor (props) {
@@ -18,6 +19,7 @@ export default class LocationInput extends React.Component {
     this.handleLocationNameChange = this.handleLocationNameChange.bind(this);
     this.deleteLocation = this.deleteLocation.bind(this);
     this.handleSavedSelection = this.handleSavedSelection.bind(this);
+    this.closeModal = this.closeModal.bind(this);
   }
 
   deleteLocation (location) {
@@ -27,6 +29,13 @@ export default class LocationInput extends React.Component {
   }
 
   componentWillMount () {
+    AsyncStorage.getItem('@safely:visited')
+    .then((visited) => {
+      if (!JSON.parse(visited)) {
+        this.setState({modalVisible: true});
+      }
+    })
+
     AsyncStorage.getItem('@safely:savedLocations')
     .then((locations) => {
       locations ? this.setState({
@@ -93,9 +102,23 @@ export default class LocationInput extends React.Component {
     });
   }
 
+  closeModal () {
+    this.setState({modalVisible: false});
+    AsyncStorage.setItem('@safely:visited', JSON.stringify(true));    
+  }
+
   render() {
     return (
       <View style={styles.container}>
+
+        <Modal
+          visible={this.state.modalVisible}
+          animation={'slide'}
+          onRequestClose={this.closeModal}
+        >
+          <ModalContents handleClose={this.closeModal}/>
+        </Modal>
+
         <Text style={styles.text}> Ready to go home? </Text>
         <TextInput
           value={this.state.address}
@@ -134,6 +157,11 @@ const styles = StyleSheet.create({
     height: 90,
     fontSize: 25,
     textAlign: 'center'
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'grey',
   },
   text: {
     fontFamily: 'roboto',

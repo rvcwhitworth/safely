@@ -9,11 +9,8 @@ export default class ConfirmTrip extends React.Component {
     this.state = {
       loading: false
     }
+    
     this.submitTrip = this.submitTrip.bind(this);
-  }
-
-  componentDidMount () {
-   
   }
 
   submitTrip () {

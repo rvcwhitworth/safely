@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, Alert, Button, View, TextInput , Text, StyleSheet } from 'react-native';
+import { ActivityIndicator, Alert, Button, View, TextInput, Text, StyleSheet } from 'react-native';
 import axios from 'axios';
 import config from '../config.js';
 import LocationInput from './LocationInput.js';
