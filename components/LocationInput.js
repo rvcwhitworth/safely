@@ -11,7 +11,8 @@ export default class LocationInput extends React.Component {
     this.state = {
       address: '',
       locations: [],
-      locationName: ''
+      locationName: '',
+      modalVisible: false
     }
 
     this.handleTextChange = this.handleTextChange.bind(this);
@@ -29,12 +30,13 @@ export default class LocationInput extends React.Component {
   }
 
   componentWillMount () {
+    // AsyncStorage.removeItem('@safely:visited')
     AsyncStorage.getItem('@safely:visited')
     .then((visited) => {
       if (!JSON.parse(visited)) {
         this.setState({modalVisible: true});
       }
-    })
+    });
 
     AsyncStorage.getItem('@safely:savedLocations')
     .then((locations) => {

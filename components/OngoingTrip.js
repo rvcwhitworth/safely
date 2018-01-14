@@ -52,7 +52,7 @@ export default class OngoingTrip extends React.Component {
       latitude: Math.abs(this.state.userLocation.coords.latitude - this.props.location.geometry.lat),
       longitude: Math.abs(this.state.userLocation.coords.longitude - this.props.location.geometry.lng)      
     }
-
+    console.log('NEW DELTA:', delta);
     if (delta.latitude < 0.001 && delta.longitude < 0.001) this.endTrip(null, true);
   }
 
@@ -61,7 +61,8 @@ export default class OngoingTrip extends React.Component {
     axios.delete(config.URL + '/api/trips', {
       params: {
         tripId: this.props.tripId, 
-        arrived: arrived
+        arrived: arrived,
+        name: this.props.name
       }
     })
     .then(() => {

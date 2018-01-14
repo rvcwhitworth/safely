@@ -53,7 +53,7 @@ app.delete('/api/trips', (req, res) => {
         client.messages.create({
           to: contact.phoneNumber,
           from: config.TWILIO_PHONE,
-          body: `Hey ${contact.name}, this is an automated message from safe.ly to inform you that your friend has arrived home.`
+          body: `Hey ${contact.name}, this is an automated message from safe.ly to inform you that ${req.query.name} has arrived home.`
         })
         .then((message) => console.log('Message Sent!', message.sid))
         .catch((err) => {

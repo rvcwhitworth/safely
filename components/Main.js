@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, Alert, Button, View, TextInput, Text, StyleSheet } from 'react-native';
+import { AsyncStorage, ActivityIndicator, Alert, Button, View, TextInput, Text, StyleSheet } from 'react-native';
 import axios from 'axios';
 import config from '../config.js';
 import LocationInput from './LocationInput.js';
@@ -13,7 +13,6 @@ export default class Main extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      currentView: 'LocationInput',
       loading: true
     }
 
@@ -26,7 +25,31 @@ export default class Main extends React.Component {
   }
 
   componentDidMount () {
-    this.getContacts().then(() => this.handleFinishLoading());
+    this.getContacts().then(() => this.handleFinishLoading());        
+  }
+
+  checkForOngoingTrip () {
+    AsyncStorage.getItem('@safely:ongoingTrip')
+    .then((trip) => {
+      if (trip) {
+        let tripInfo = JSON.parse(trip);
+        console.log('tripInfo!', tripInfo);
+        Alert.alert('Ongoing trip found!', 'Press OK to continue your trip.');
+        this.setState({
+          loading: false,
+          location: tripInfo.location,
+          tripId: tripInfo.tripId,
+          selectedContacts: tripInfo.selectedContacts,
+          name: tripInfo.name,
+          currentView: 'OngoingTrip'
+        });
+      } else {
+        this.setState({
+          loading: false,
+          currentView:'LocationInput'
+        });
+      }
+    });
   }
 
   async getContacts () {
@@ -54,6 +77,12 @@ export default class Main extends React.Component {
   }
 
   setLocation (location) {
+    AsyncStorage.getItem('@safely:name')
+    .then((name) => {
+      this.setState({name: JSON.parse(name)});
+    })
+    .catch((err) => console.error('Error retrieving name from file', err));
+
     this.setState({
       location: location,
       currentView: 'ContactList'
@@ -68,12 +97,13 @@ export default class Main extends React.Component {
   }
 
   handleFinishLoading () {
-    this.setState({
-      loading: false
-    });
+    this.checkForOngoingTrip();
   }
 
   cancelTrip () {
+    AsyncStorage.removeItem('@safely:ongoingTrip')
+    .catch((err) => console.error('Error deleting trip from file', err));
+
     this.setState({
       selectedContacts: [],
       location: null,
@@ -83,6 +113,16 @@ export default class Main extends React.Component {
   }
 
   confirmTrip (tripId) {
+    let trip = {
+      location: this.state.location,
+      tripId: tripId,
+      selectedContacts: this.state.selectedContacts,
+      name: this.state.name
+    }
+    
+    AsyncStorage.setItem('@safely:ongoingTrip', JSON.stringify(trip))
+    .catch((err) => console.error('Error saving trip to file', err));
+
     this.setState({
       tripId: tripId,
       currentView: 'OngoingTrip'
@@ -92,9 +132,9 @@ export default class Main extends React.Component {
   render() {
     if (this.state.loading) {
       return (
-          <View style={{flex: 1, justifyContent: 'center'}}>
-            <ActivityIndicator animating={true} size="large" color="#1abc9c" />
-          </View>
+        <View style={{flex: 1, justifyContent: 'center'}}>
+          <ActivityIndicator animating={true} size="large" color="#1abc9c" />
+        </View>
       )
     } else {
       switch (this.state.currentView) {
@@ -110,15 +150,22 @@ export default class Main extends React.Component {
               location={this.state.location}
               confirmTrip={this.confirmTrip}
             />
-          )
+          );
         case 'OngoingTrip':
           return (
             <OngoingTrip
               cancelTrip={this.cancelTrip}
               location={this.state.location}
               tripId={this.state.tripId}
+              name={this.state.name}
             />
-          )
+          );
+        default:
+          return (
+            <View style={{flex: 1, justifyContent: 'center'}}>
+              <ActivityIndicator animating={true} size="large" color="#1abc9c" />
+            </View>
+          ); 
       }
     }
   }
