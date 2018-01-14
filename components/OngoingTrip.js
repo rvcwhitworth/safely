@@ -43,7 +43,7 @@ export default class OngoingTrip extends React.Component {
     this.setState({userLocation}, () => {
       axios.put(config.URL + '/api/trips', {tripId: this.props.tripId, userLocation: this.state.userLocation})
       .then((response) => this.compareLocation())
-      .catch((err) => console.error('Error updating location', err));
+      .catch((err) => console.log(err));
     });
   }
 
