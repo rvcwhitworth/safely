@@ -12,6 +12,7 @@ db.once('open', function() {
 });
 
 let tripSchema = mongoose.Schema({
+  userName: String,
   userLocation: String,
   destination: String,
   contacts: String,
@@ -20,8 +21,9 @@ let tripSchema = mongoose.Schema({
 
 let Trip = mongoose.model('Trip', tripSchema);
 
-const addNewTrip = ({location, contacts}) => {
+const addNewTrip = ({name, location, contacts}) => {
   return Trip.create({
+    userName: name,
     userLocation: null,
     destination: JSON.stringify(location),
     contacts: JSON.stringify(contacts),
@@ -43,16 +45,18 @@ const deleteTrip = (tripId) => {
   return Trip.remove({_id: tripId});
 };
 
-const getContacts = (tripId) => {
-  return Trip.findById(tripId)
-  .then((trip) => {
-    return JSON.parse(trip.contacts);
-  });
-}
+const getTrip = (tripId) => {
+  return Trip.findById(tripId);
+};
+
+const getTrips = () => {
+  return Trip.find()
+};
 
 module.exports = {
   addNewTrip,
   updateTrip,
   deleteTrip,
-  getContacts
+  getTrip,
+  getTrips
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, Alert, Button, View, Text, StyleSheet } from 'react-native';
+import { TouchableHighlight, ScrollView, Alert, Button, View, Text, StyleSheet } from 'react-native';
 import axios from 'axios';
 import { Location, Permissions } from 'expo';
 import config from '../config.js';
@@ -21,6 +21,7 @@ export default class OngoingTrip extends React.Component {
     }
     this.updateLocation = this.updateLocation.bind(this);
     this.endTrip = this.endTrip.bind(this);
+    this.handleAlert = this.handleAlert.bind(this);
   }
 
   componentDidMount () {
@@ -61,8 +62,7 @@ export default class OngoingTrip extends React.Component {
     axios.delete(config.URL + '/api/trips', {
       params: {
         tripId: this.props.tripId, 
-        arrived: arrived,
-        name: this.props.name
+        arrived: arrived
       }
     })
     .then(() => {
@@ -74,11 +74,25 @@ export default class OngoingTrip extends React.Component {
     .catch((err) => console.error('Error completing trip!', err));
   }
 
+  handleAlert () {
+    axios.post(config.URL + '/api/alert', {tripId: this.props.tripId, userLocation: this.state.userLocation})
+    .then((response) => Alert.alert('Alert sent!', 'Your contacts have been alerted with your current position.'))
+    .catch((err) => console.error('Error sending alert!', err));
+  }
+
   render() {
     return (
       <View style={styles.container}>
         <Text style={styles.text}> Ongoing Trip </Text>
         <Text style={styles.subHeader}> Get there safely, we'll take care of everything else! </Text>
+        <TouchableHighlight
+          onLongPress={this.handleAlert} 
+          underlayColor="white"
+        >
+          <View style={styles.alertButton}>
+            <Text style={styles.buttonText}> HOLD TO ALERT </Text>
+          </View>
+        </TouchableHighlight>
         <Button
           title="Cancel Trip"
           onPress={this.endTrip}
@@ -96,14 +110,29 @@ const styles = StyleSheet.create({
     fontSize: 35,
     fontWeight: 'bold'
   },
+  alertButton: {
+    marginBottom: 30,
+    width: 260,
+    alignItems: 'center',
+    backgroundColor: 'maroon'
+  },
+  buttonText: {
+    textAlign: 'center',
+    padding: 20,
+    color: 'white',
+    fontFamily: 'roboto',
+    fontWeight: 'bold',
+    fontSize: 25
+  },
   container: {
     flex: 1,
     marginTop: 10,
     padding: 10,
+    alignItems: 'center',
     justifyContent: 'space-between'
   },
   subHeader: {
-    paddingTop: 20,
+    paddingTop: 10,
     fontFamily: 'roboto',
     textAlign: 'center',
     fontSize: 20,

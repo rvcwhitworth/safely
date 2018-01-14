@@ -9,7 +9,7 @@ export default class ConfirmTrip extends React.Component {
     this.state = {
       loading: false
     }
-    
+
     this.submitTrip = this.submitTrip.bind(this);
   }
 
@@ -17,7 +17,12 @@ export default class ConfirmTrip extends React.Component {
     this.setState({
       loading: true
     }, () => {
-      axios.post(config.URL + '/api/trips', {location: this.props.location, contacts: this.props.contacts})
+      axios.post(config.URL + '/api/trips', 
+      {
+        name: this.props.name,
+        location: this.props.location, 
+        contacts: this.props.contacts
+      })
       .then((response) => {
         this.setState({
           loading: false

@@ -33,16 +33,29 @@ export default class Main extends React.Component {
     .then((trip) => {
       if (trip) {
         let tripInfo = JSON.parse(trip);
-        console.log('tripInfo!', tripInfo);
-        Alert.alert('Ongoing trip found!', 'Press OK to continue your trip.');
-        this.setState({
-          loading: false,
-          location: tripInfo.location,
-          tripId: tripInfo.tripId,
-          selectedContacts: tripInfo.selectedContacts,
-          name: tripInfo.name,
-          currentView: 'OngoingTrip'
-        });
+
+        axios.get(config.URL + '/api/trips', {
+          params: {
+            tripId: tripInfo.tripId
+          }
+        })
+        .then((response) => {
+          Alert.alert('Ongoing trip found!', 'Press OK to continue your trip.');
+          this.setState({
+            loading: false,
+            location: tripInfo.location,
+            tripId: tripInfo.tripId,
+            selectedContacts: tripInfo.selectedContacts,
+            name: tripInfo.name,
+            currentView: 'OngoingTrip'
+          });
+        })
+        .catch((err) => {
+          this.setState({
+            loading: false,
+            currentView:'LocationInput'
+          });
+        })
       } else {
         this.setState({
           loading: false,
@@ -149,6 +162,7 @@ export default class Main extends React.Component {
               contacts={this.state.selectedContacts} 
               location={this.state.location}
               confirmTrip={this.confirmTrip}
+              name={this.state.name}
             />
           );
         case 'OngoingTrip':
