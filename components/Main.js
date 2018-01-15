@@ -25,7 +25,6 @@ export default class Main extends React.Component {
   }
 
   componentDidMount () {
-    this.getContacts().then(() => this.handleFinishLoading());        
   }
 
   checkForOngoingTrip () {
@@ -144,9 +143,10 @@ export default class Main extends React.Component {
 
   render() {
     if (this.state.loading) {
+      this.getContacts().then(() => this.handleFinishLoading());            
       return (
-        <View style={{flex: 1, justifyContent: 'center'}}>
-          <ActivityIndicator animating={true} size="large" color="#1abc9c" />
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" color="#1abc9c" />
         </View>
       )
     } else {
@@ -176,7 +176,7 @@ export default class Main extends React.Component {
           );
         default:
           return (
-            <View style={{flex: 1, justifyContent: 'center'}}>
+            <View style={styles.loading}>
               <ActivityIndicator animating={true} size="large" color="#1abc9c" />
             </View>
           ); 
@@ -185,3 +185,9 @@ export default class Main extends React.Component {
   }
 }
 
+const styles = StyleSheet.create({
+  loading: {
+    flex: 1, 
+    justifyContent: 'center'
+  }
+});

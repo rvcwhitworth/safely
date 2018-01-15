@@ -54,9 +54,8 @@ app.put('/api/trips', (req, res) => {
 app.delete('/api/trips', (req, res) => {
   if (req.query.arrived === 'true') {
     db.getTrip(req.query.tripId)
-    .then((trip) => JSON.parse(trip.contacts))
-    .then((contacts) => {
-      contacts.forEach((contact) => {
+    .then((trip) => {
+      JSON.parse(trip.contacts).forEach((contact) => {
         let message = `Hey ${contact.name}, this is an automated message from safe.ly`  + 
         ` to inform you that ${trip.userName} has arrived home. Try the app yourself at exp.host/@rvcwhitworth/safely`;
         sendTwilioMessage(contact.phoneNumber, message);
@@ -111,8 +110,8 @@ const checkForExpiredTrips = () => {
         JSON.parse(trip.contacts).forEach((contact) => {
           let message = `Hey ${contact.name}, this is an automated message from safe.ly` +
           ` to inform you that ${trip.userName} hasn't updated their location in half an hour.` +
-          `This most likely means that their battery has died, but feel free to contact them.` +
-          ` Their last location was https://www.google.com/maps/?q=${lastLocation.coords.latitude + ',' + lastLocation.coords.longitude}.`
+          ` This most likely means that their battery has died, but feel free to contact them.` +
+          ` Their last location was https://www.google.com/maps/?q=${lastLocation.coords.latitude + ',' + lastLocation.coords.longitude}.` + 
           ` Try the app yourself at exp.host/@rvcwhitworth/safely`;
           sendTwilioMessage(contact.phoneNumber, message);
         });

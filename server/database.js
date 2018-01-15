@@ -38,7 +38,8 @@ const updateTrip = ({tripId, userLocation}) => {
       userLocation: JSON.stringify(userLocation),
       lastUpdated: JSON.stringify(new Date())
     });
-  });
+  })
+  .catch((err) => console.error('Error updating trip', err));
 };
 
 const deleteTrip = (tripId) => {
